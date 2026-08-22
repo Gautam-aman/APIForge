@@ -1,5 +1,7 @@
 package com.aman.backend.controller;
 
+import com.aman.backend.dto.ApiResponse;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,8 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
 
 	@GetMapping("/health")
-	public ResponseEntity<String> getHealth(){
-		return ResponseEntity.ok().body("APIForge backend is running");
+	public ApiResponse<String> getHealth(){
+		return new ApiResponse<>(
+				true,
+				"APIForge backend is running",
+				"Health check successful"
+		);
 	}
 
 }

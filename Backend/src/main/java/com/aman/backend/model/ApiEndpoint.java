@@ -6,6 +6,10 @@ public record ApiEndpoint(
 		String path,
 		String method,
 		String summary,
-		List<String> responseCodes
+		String description,
+		List<ApiParameter> parameters,
+		ApiRequestBody requestBody,
+		List<ApiResponse> responses,
+		AuthenticationInfo authentication
 ) {
 }

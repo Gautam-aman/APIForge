@@ -35,7 +35,6 @@ public class OpenApiParserService {
 		for (Map.Entry<String, PathItem> entry : openAPI.getPaths().entrySet()) {
 			String path = entry.getKey();
 			PathItem pathItem = entry.getValue();
-
 			addEndpoint(endpoints, path, "GET", pathItem.getGet());
 			addEndpoint(endpoints, path, "POST", pathItem.getPost());
 			addEndpoint(endpoints, path, "PUT", pathItem.getPut());
@@ -44,14 +43,11 @@ public class OpenApiParserService {
 			addEndpoint(endpoints, path, "HEAD", pathItem.getHead());
 			addEndpoint(endpoints, path, "OPTIONS", pathItem.getOptions());
 		}
-
 		return endpoints;
 	}
 
 	private void addEndpoint(List<ApiEndpoint> endpoints, String path, String method, Operation operation) {
-
 		if (operation == null) {return;}
-
 		List<String> responseCodes = operation.getResponses().keySet().stream().toList();
 
 		endpoints.add(new ApiEndpoint(

@@ -12,4 +12,5 @@ public record ApiEndpoint(
 		List<ApiResponse> responses,
 		AuthenticationInfo authentication
 ) {
+
 }

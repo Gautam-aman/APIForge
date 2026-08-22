@@ -24,7 +24,7 @@ public class ApiAnalysisController {
 	public ApiResponse<ApiAnalysisResponse> analyze(@Valid @RequestBody AnalyzeApiRequest request) {
 		ApiAnalysisResponse response = apiAnalysisService.analyze(request.apiDefinition());
 
-		return new ApiResponse<>(true, response, "API analyzed successfully");
+		return new ApiResponse<>(response, "API analyzed successfully");
 	}
 
 }

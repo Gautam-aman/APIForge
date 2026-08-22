@@ -14,7 +14,6 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse<Void>> handleBadRequest(IllegalArgumentException exception) {
 		ApiResponse<Void> response =
 				new ApiResponse<>(
-						false,
 						null,
 						exception.getMessage()
 				);

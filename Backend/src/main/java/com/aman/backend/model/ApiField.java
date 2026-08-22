@@ -1,5 +1,6 @@
 package com.aman.backend.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record ApiField(
@@ -9,6 +10,12 @@ public record ApiField(
 		boolean required,
 		String description,
 		Object example,
-		List<String> enumValues
+		List<String> enumValues,
+		BigDecimal minimum,
+		BigDecimal maximum,
+		Integer minLength,
+		Integer maxLength,
+		String pattern
+
 ) {
 }

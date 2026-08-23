@@ -137,4 +137,251 @@ public class TestCaseGeneratorService {
 			return 200;
 		}
 	}
+
+	private void generateRequiredFieldTests(ApiEndpoint endpoint, List<TestCase> testCases) {
+
+		if (endpoint.requestBody() == null) {
+			return;
+		}
+
+		for (ApiField field : endpoint.requestBody().fields()) {
+			if (!field.required()) {
+				continue;
+			}
+			Object validBody = createValidBody(endpoint);
+
+			if (!(validBody instanceof Map<?, ?>)) {
+				continue;
+			}
+
+			Map<String, Object> invalidBody = new HashMap<>((Map<String, Object>) validBody);
+			invalidBody.remove(field.name());
+
+			TestRequest request =
+					new TestRequest(
+							endpoint.method(),
+							endpoint.path(),
+							Map.of(),
+							Map.of(),
+							Map.of(
+									"Content-Type",
+									"application/json"
+							),
+							invalidBody
+					);
+
+			testCases.add(
+					new TestCase(
+							UUID.randomUUID().toString(),
+							"Missing required field: " +
+									field.name(),
+							TestCategory.REQUIRED_FIELD,
+							TestPriority.HIGH,
+							"Verify that the API rejects a request when required field '" +
+									field.name() +
+									"' is missing.",
+							request,
+							400,
+							"The OpenAPI schema marks this field as required."
+					)
+			);
+		}
+	}
+
+	private void generateBoundaryTests(ApiEndpoint endpoint, List<TestCase> testCases) {
+		if (endpoint.requestBody() == null) {
+			return;
+		}
+
+		for (ApiField field : endpoint.requestBody().fields()) {
+
+			if (field.minimum() != null) {
+				addBoundaryTest(
+						endpoint,
+						field,
+						field.minimum().subtract(
+								java.math.BigDecimal.ONE
+						),
+						"below minimum",
+						testCases
+				);
+			}
+
+			if (field.maximum() != null) {
+				addBoundaryTest(
+						endpoint,
+						field,
+						field.maximum().add(
+								java.math.BigDecimal.ONE
+						),
+						"above maximum",
+						testCases
+				);
+			}
+
+			if (field.minLength() != null) {
+				String value =
+						"x".repeat(
+								Math.max(
+										0,
+										field.minLength() - 1
+								)
+						);
+
+				addBoundaryTest(
+						endpoint,
+						field,
+						value,
+						"below minimum length",
+						testCases
+				);
+			}
+
+			if (field.maxLength() != null) {
+
+				String value = "x".repeat(field.maxLength() + 1);
+
+				addBoundaryTest(
+						endpoint,
+						field,
+						value,
+						"above maximum length",
+						testCases
+				);
+			}
+		}
+	}
+
+	private void addBoundaryTest(ApiEndpoint endpoint, ApiField field, Object invalidValue, String scenario, List<TestCase> testCases) {
+
+		Object validBody = createValidBody(endpoint);
+
+		if (!(validBody instanceof Map<?, ?>)) {
+			return;
+		}
+
+		Map<String, Object> invalidBody = new HashMap<>((Map<String, Object>) validBody);
+		invalidBody.put(
+				field.name(),
+				invalidValue
+		);
+
+		TestRequest request =
+				new TestRequest(
+						endpoint.method(),
+						endpoint.path(),
+						Map.of(),
+						Map.of(),
+						Map.of(
+								"Content-Type",
+								"application/json"
+						),
+						invalidBody
+				);
+
+		testCases.add(
+				new TestCase(
+						UUID.randomUUID().toString(),
+						"Boundary test: " +
+								field.name() +
+								" - " +
+								scenario,
+						TestCategory.BOUNDARY,
+						TestPriority.MEDIUM,
+						"Verify validation boundary for field '" +
+								field.name() +
+								"'.",
+						request,
+						400,
+						"The API schema defines a boundary that should be enforced."
+				)
+		);
+	}
+
+	private void generateFormatTests(ApiEndpoint endpoint, List<TestCase> testCases) {
+
+		if (endpoint.requestBody() == null) {
+			return;
+		}
+
+		for (ApiField field :
+				endpoint.requestBody().fields()) {
+
+			if ("email".equals(field.format())) {
+
+				Object validBody = createValidBody(endpoint);
+
+				if (!(validBody instanceof Map<?, ?>)) {
+					continue;
+				}
+
+				Map<String, Object> invalidBody = new HashMap<>((Map<String, Object>) validBody);
+
+				invalidBody.put(
+						field.name(),
+						"not-an-email"
+				);
+				TestRequest request =
+						new TestRequest(
+								endpoint.method(),
+								endpoint.path(),
+								Map.of(),
+								Map.of(),
+								Map.of(
+										"Content-Type",
+										"application/json"
+								),
+								invalidBody
+						);
+
+				testCases.add(
+						new TestCase(
+								UUID.randomUUID().toString(),
+								"Invalid email: " +
+										field.name(),
+								TestCategory.FORMAT,
+								TestPriority.MEDIUM,
+								"Verify that invalid email format is rejected.",
+								request,
+								400,
+								"OpenAPI declares this field as an email format."
+						)
+				);
+			}
+		}
+	}
+
+	private void generateAuthenticationTests(ApiEndpoint endpoint, List<TestCase> testCases) {
+		if (endpoint.authentication() == null ||
+				!endpoint.authentication().required()) {
+
+			return;
+		}
+
+		TestRequest request =
+				new TestRequest(
+						endpoint.method(),
+						endpoint.path(),
+						Map.of(),
+						Map.of(),
+						Map.of(
+								"Content-Type",
+								"application/json"
+						),
+						createValidBody(endpoint)
+				);
+
+		testCases.add(new TestCase(
+						UUID.randomUUID().toString(),
+						"Missing authentication",
+						TestCategory.AUTHENTICATION,
+						TestPriority.HIGH,
+						"Verify that the API rejects unauthenticated requests.",
+						request,
+						401,
+						"The OpenAPI specification declares authentication for this endpoint."
+				)
+		);
+	}
+
 }

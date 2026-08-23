@@ -1,13 +1,17 @@
 package com.aman.backend.controller;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.aman.backend.dto.AnalyzeApiRequest;
 import com.aman.backend.dto.ApiAnalysisResponse;
 import com.aman.backend.dto.ApiResponse;
+import com.aman.backend.model.AiTestAgentResponse;
 import com.aman.backend.model.AiTestSuggestion;
+import com.aman.backend.model.ApiEndpoint;
 import com.aman.backend.model.TestCase;
+import com.aman.backend.service.AiTestAgentService;
 import com.aman.backend.service.ApiAnalysisService;
 import com.aman.backend.service.TestCaseGeneratorService;
 import jakarta.validation.Valid;
@@ -25,6 +29,7 @@ public class ApiAnalysisController {
 
 	private final ApiAnalysisService apiAnalysisService;
 	private final TestCaseGeneratorService testCaseGeneratorService;
+	private final AiTestAgentService aiTestAgentService;
 
 	@PostMapping("/analyze")
 	public ApiResponse<ApiAnalysisResponse> analyze(@Valid @RequestBody AnalyzeApiRequest request) {
@@ -35,15 +40,23 @@ public class ApiAnalysisController {
 
 	@PostMapping("/ai-test-cases")
 	public ApiResponse<List<AiTestSuggestion>> generateAiTestCases(@Valid @RequestBody AnalyzeApiRequest request) {
+
 		ApiAnalysisResponse analysis = apiAnalysisService.analyze(request.apiDefinition());
+		List<AiTestSuggestion> suggestions = new ArrayList<>();
 
-		List<AiTestSuggestion> suggestions = new java.util.ArrayList<>();
+		for (ApiEndpoint endpoint : analysis.endpoints()) {
 
-		for (TestCase existingTest :
-				testCaseGeneratorService.generate(analysis.endpoints())) {
+			List<TestCase> deterministicTests = testCaseGeneratorService.generateForEndpoint(endpoint);
 
-			// We'll group deterministic tests by endpoint
-			// in the next refactor.
+			AiTestAgentResponse response = aiTestAgentService
+							.generateSuggestions(
+									endpoint,
+									deterministicTests
+							);
+
+			suggestions.addAll(
+					response.suggestions()
+			);
 		}
 
 		return new ApiResponse<>(

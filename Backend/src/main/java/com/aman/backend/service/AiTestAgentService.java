@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 public class AiTestAgentService {
 
 	private final ChatClient chatClient;
+	private final AiContextBuilder aiContextBuilder;
 
-	public AiTestAgentService(ChatClient.Builder chatClientBuilder) {
+	public AiTestAgentService(ChatClient.Builder chatClientBuilder , AiContextBuilder aiContextBuilder) {
+		this.aiContextBuilder = aiContextBuilder;
 		this.chatClient = chatClientBuilder.build();
 	}
 
@@ -60,7 +62,7 @@ public class AiTestAgentService {
 
                 Endpoint:
                 """);
-		prompt.append(endpoint);
+		prompt.append(aiContextBuilder.build(endpoint));
 		prompt.append("""
 
                 Existing deterministic tests:

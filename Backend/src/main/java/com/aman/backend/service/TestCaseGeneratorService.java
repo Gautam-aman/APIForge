@@ -21,15 +21,10 @@ public class TestCaseGeneratorService {
 
 	public List<TestCase> generate(List<ApiEndpoint> endpoints) {
 		List<TestCase> testCases = new ArrayList<>();
-
 		for (ApiEndpoint endpoint : endpoints) {
-
-			testCases.add(generateHappyPath(endpoint));
-			generateRequiredFieldTests(endpoint, testCases);
-			generateBoundaryTests(endpoint, testCases);
-			generateFormatTests(endpoint, testCases);
-			generateAuthenticationTests(endpoint, testCases);
+			testCases.addAll(generateForEndpoint(endpoint));
 		}
+
 		return testCases;
 	}
 
@@ -382,6 +377,30 @@ public class TestCaseGeneratorService {
 						"The OpenAPI specification declares authentication for this endpoint."
 				)
 		);
+	}
+
+	public List<TestCase> generateForEndpoint(ApiEndpoint endpoint) {
+
+		List<TestCase> testCases = new ArrayList<>();
+
+		testCases.add(generateHappyPath(endpoint));
+		generateRequiredFieldTests(
+				endpoint,
+				testCases
+		);
+		generateBoundaryTests(
+				endpoint,
+				testCases
+		);
+		generateFormatTests(
+				endpoint,
+				testCases
+		);
+		generateAuthenticationTests(
+				endpoint,
+				testCases
+		);
+		return testCases;
 	}
 
 }

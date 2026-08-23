@@ -1,0 +1,17 @@
+package com.aman.backend.model;
+
+
+public enum TestCategory {
+
+	HAPPY_PATH,
+	REQUIRED_FIELD,
+	INVALID_TYPE,
+	BOUNDARY,
+	FORMAT,
+	ENUM,
+	AUTHENTICATION,
+	AUTHORIZATION,
+	INVALID_PARAMETER,
+	ERROR_RESPONSE
+
+}

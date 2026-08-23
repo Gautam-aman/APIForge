@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Backend
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+         model: gpt-5-mini

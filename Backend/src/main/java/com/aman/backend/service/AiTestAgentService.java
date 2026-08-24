@@ -64,7 +64,6 @@ public class AiTestAgentService {
                 """);
 		prompt.append(aiContextBuilder.build(endpoint));
 		prompt.append("""
-
                 Existing deterministic tests:
                 """);
 
@@ -79,7 +78,6 @@ public class AiTestAgentService {
 
                 Generate additional tests that provide
                 meaningful coverage beyond the existing tests.
-
                 Return at most 8 suggestions.
                 """);
 

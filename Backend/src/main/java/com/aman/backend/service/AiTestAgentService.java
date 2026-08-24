@@ -3,6 +3,7 @@ package com.aman.backend.service;
 import java.util.List;
 
 import com.aman.backend.model.AiTestAgentResponse;
+import com.aman.backend.model.AiTestSuggestion;
 import com.aman.backend.model.ApiEndpoint;
 import com.aman.backend.model.TestCase;
 
@@ -83,4 +84,39 @@ public class AiTestAgentService {
 
 		return prompt.toString();
 	}
+
+	public AiTestAgentResponse repair(ApiEndpoint endpoint, AiTestSuggestion invalidSuggestion, String validationError) {
+		String prompt = """
+            A previous AI-generated API test was invalid.
+            API:
+            %s
+
+            Invalid test:
+            %s
+
+            Validation error:
+            %s
+
+            Repair the test.
+
+            Requirements:
+
+            - Use only fields and parameters
+              that exist in the API.
+            - Keep the test's original intent
+              if it is still meaningful.
+            - Return a valid structured test.
+            """.formatted(
+				aiContextBuilder.build(endpoint),
+				invalidSuggestion,
+				validationError
+		);
+		return chatClient
+				.prompt()
+				.system(systemPrompt())
+				.user(prompt)
+				.call()
+				.entity(AiTestAgentResponse.class);
+	}
+
 }

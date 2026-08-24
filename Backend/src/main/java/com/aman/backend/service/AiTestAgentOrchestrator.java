@@ -32,15 +32,35 @@ public class AiTestAgentOrchestrator {
 		int duplicates = 0;
 
 		for (AiTestSuggestion suggestion : response.suggestions()) {
-
-			AiTestValidationResult validation =
-					validatorService.validate(
-							endpoint,
-							suggestion
-					);
+			AiTestValidationResult validation = validatorService.validate(endpoint, suggestion);
 
 			if (!validation.valid()) {
-				rejected++;
+				AiTestAgentResponse repairResponse =
+						aiTestAgentService.repair(
+								endpoint,
+								suggestion,
+								validation.reason()
+						);
+
+				for (AiTestSuggestion repaired : repairResponse.suggestions()) {
+					AiTestValidationResult repairedValidation =
+							validatorService.validate(
+									endpoint,
+									repaired
+							);
+
+					if (repairedValidation.valid() &&
+							!duplicateDetector.isDuplicate(
+									repaired,
+									deterministicTests,
+									accepted
+							)) {
+
+						accepted.add(repaired);
+						break;
+					}
+				}
+
 				continue;
 			}
 

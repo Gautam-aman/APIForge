@@ -11,7 +11,6 @@ import com.aman.backend.model.AiTestSuggestion;
 import com.aman.backend.model.ApiEndpoint;
 import com.aman.backend.model.TestCase;
 import com.aman.backend.service.AiTestAgentOrchestrator;
-import com.aman.backend.service.AiTestAgentService;
 import com.aman.backend.service.ApiAnalysisService;
 import com.aman.backend.service.TestCaseGeneratorService;
 import jakarta.validation.Valid;
@@ -44,8 +43,7 @@ public class ApiAnalysisController {
 		List<AiTestSuggestion> suggestions = new ArrayList<>();
 
 		for (ApiEndpoint endpoint : analysis.endpoints()) {
-			suggestions.addAll(aiTestAgentOrchestrator.generate(endpoint)
-			);
+			suggestions.addAll(aiTestAgentOrchestrator.generate(endpoint).suggestions());
 		}
 		return new ApiResponse<>(suggestions, "AI test cases generated successfully"
 		);

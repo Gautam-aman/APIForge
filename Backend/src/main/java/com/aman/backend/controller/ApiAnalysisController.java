@@ -7,6 +7,7 @@ import java.util.List;
 import com.aman.backend.dto.AnalyzeApiRequest;
 import com.aman.backend.dto.ApiAnalysisResponse;
 import com.aman.backend.dto.ApiResponse;
+import com.aman.backend.model.AiAgentResult;
 import com.aman.backend.model.AiTestSuggestion;
 import com.aman.backend.model.ApiEndpoint;
 import com.aman.backend.model.TestCase;
@@ -40,12 +41,17 @@ public class ApiAnalysisController {
 	@PostMapping("/ai-test-cases")
 	public ApiResponse<List<AiTestSuggestion>> generateAiTestCases(@Valid @RequestBody AnalyzeApiRequest request) {
 		ApiAnalysisResponse analysis = apiAnalysisService.analyze(request.apiDefinition());
+
 		List<AiTestSuggestion> suggestions = new ArrayList<>();
 
 		for (ApiEndpoint endpoint : analysis.endpoints()) {
-			suggestions.addAll(aiTestAgentOrchestrator.generate(endpoint).suggestions());
+			AiAgentResult result = aiTestAgentOrchestrator.generate(endpoint);
+			suggestions.addAll(result.suggestions());
 		}
-		return new ApiResponse<>(suggestions, "AI test cases generated successfully"
+
+		return new ApiResponse<>(
+				suggestions,
+				"AI test cases generated successfully"
 		);
 	}
 

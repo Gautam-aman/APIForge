@@ -7,3 +7,10 @@ spring:
       api-key: ${OPENAI_API_KEY}
       chat:
          model: gpt-5-mini
+
+apiforge:
+  execution:
+    connect-timeout-ms: 3000
+    request-timeout-ms: 10000
+    max-concurrency: 5
+    max-tests-per-run: 100

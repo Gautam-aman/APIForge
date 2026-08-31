@@ -151,7 +151,7 @@ public class OpenApiParserService {
 					? List.of()
 					: fieldSchema.getEnum().stream().map(Object::toString).toList();
 
-			new ApiField(
+			fields.add(new ApiField(
 					fieldName,
 					fieldSchema.getType(),
 					fieldSchema.getFormat(),
@@ -164,7 +164,7 @@ public class OpenApiParserService {
 					fieldSchema.getMinLength(),
 					fieldSchema.getMaxLength(),
 					fieldSchema.getPattern()
-			);
+			));
 		}
 
 		return fields;

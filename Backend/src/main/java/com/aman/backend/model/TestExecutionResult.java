@@ -1,5 +1,6 @@
 package com.aman.backend.model;
 
+import java.util.List;
 
 public record TestExecutionResult(
 		String testId,
@@ -10,7 +11,8 @@ public record TestExecutionResult(
 		long durationMs,
 		String responseBody,
 		String error,
-		String explanation
+		String explanation,
+		List<AssertionResult> assertions
 
 ) {
 }

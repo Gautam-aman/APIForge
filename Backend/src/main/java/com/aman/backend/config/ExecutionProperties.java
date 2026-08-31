@@ -7,7 +7,8 @@ public record ExecutionProperties(
 		long connectTimeoutMs,
 		long requestTimeoutMs,
 		int maxConcurrency,
-		int maxTestsPerRun
+		int maxTestsPerRun,
+		int maxResponseBodyBytes
 
 ) {
 }

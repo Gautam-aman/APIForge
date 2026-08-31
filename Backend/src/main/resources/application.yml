@@ -14,3 +14,4 @@ apiforge:
     request-timeout-ms: 10000
     max-concurrency: 5
     max-tests-per-run: 100
+    max-response-body-bytes: 65536
